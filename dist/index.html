@@ -1,11 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Young Nen</title>
+  <meta charset="UTF-8" />
+  <title>how to ues LocalStorage</title>
+  <style>
+    
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .hidden {
+      display: none; 
+    }
+    input, select {
+      margin: 8px 0;
+      padding: 8px;
+      display: block;
+      width: 250px;
+    }
+    button {
+      background-color: rgb(210, 229, 190);
+      padding: 8px 16px;
+      margin-top: 10px;
+    }
+    .container {
+    background-color: bisque;
+      margin-bottom: 30px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+    }
+  </style>
 </head>
 <body>
-    <span>Nen Go!</span>
+
+  <div class="container" id="registerSection">
+    <h2>Register</h2>
+    <input type="text" id="fullName" placeholder="Full Name" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <input type="text" id="state" placeholder="State" />
+    <select id="gender">
+      <option value="">Select Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+    <button onclick="register()">Register</button>
+  </div>
+
+  <div class="container" id="loginSection">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email" />
+    <input type="password" id="loginPassword" placeholder="Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div class="container hidden" id="profileSection">
+    <h2>User Profile</h2>
+    <p><strong>Full Name:</strong> <span id="profileName"></span></p>
+    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+    <p><strong>State:</strong> <span id="profileState"></span></p>
+    <p><strong>Gender:</strong> <span id="profileGender"></span></p>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    function register() {
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const state = document.getElementById("state").value.trim();
+      const gender = document.getElementById("gender").value;
+  
+      if (!fullName || !email || !password || !state || !gender) {
+        alert("Please fill in all fields.");
+        return;
+      }
+  
+      const user = { fullName, email, password, state, gender };
+  
+      localStorage.setItem(`user_${email}`, JSON.stringify(user));
+  
+      alert("Registration successful! You can now log in.");
+    }
+  
+    function login() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+  
+      const storedUser = localStorage.getItem(`user_${email}`);
+  
+      if (!storedUser) {
+        alert("User not found.");
+        return;
+      }
+  
+      const user = JSON.parse(storedUser);
+  
+      if (user.password !== password) {
+        alert("Incorrect password.");
+        return;
+      }
+  
+      localStorage.setItem("currentUser", email);
+  
+      showProfile(user);
+    }
+  
+    function showProfile(user) {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("registerSection").classList.add("hidden");
+      document.getElementById("profileSection").classList.remove("hidden");
+  
+      document.getElementById("profileName").textContent = user.fullName;
+      document.getElementById("profileEmail").textContent = user.email;
+      document.getElementById("profileState").textContent = user.state;
+      document.getElementById("profileGender").textContent = user.gender;
+    }
+  
+    function logout() {
+      localStorage.removeItem("currentUser");
+  
+      document.getElementById("profileSection").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("registerSection").classList.remove("hidden");
+    }
+  
+    window.onload = () => {
+      const currentUserEmail = localStorage.getItem("currentUser");
+  
+      if (currentUserEmail) {
+        const user = JSON.parse(localStorage.getItem(`user_${currentUserEmail}`));
+  
+        if (user) {
+          showProfile(user);
+        }
+      }
+    };
+  </script>
+  
+
 </body>
 </html>
